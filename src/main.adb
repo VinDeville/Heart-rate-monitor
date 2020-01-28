@@ -41,9 +41,11 @@ with STM32.Board;           use STM32.Board;
 with HAL.Bitmap;            use HAL.Bitmap;
 with HAL.Framebuffer;       use HAL.Framebuffer;
 with STM32.User_Button;     use STM32;
+with STM32.GPIO;            use STM32.GPIO;
 with BMP_Fonts;
 with LCD_Std_Out;
 with graph; use graph;
+with testadc; use testadc;
 
 procedure Main 
 is
@@ -74,8 +76,7 @@ is
    type Mode is (Drawing_Mode, Bitmap_Showcase_Mode);
 
    Current_Mode : Mode := Drawing_Mode;
-
-begin
+ begin
 
    --  Initialize LCD
    Display.Initialize(Landscape);
@@ -83,30 +84,16 @@ begin
    --  Initialize touch panel
    
    --  Initialize button
-   User_Button.Initialize;
+   --User_Button.Initialize;
    
    --  Clear LCD (set background)
 
    --  The application: set pixel where the finger is (so that you
    --  cannot see what you are drawing).
-   loop
-      display_Cardiac_Graph(Display,
-                            (120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0,
-                             120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0,
-                             120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0),
-                            0,
-                            240,
-                            120
-                           );
-      delay 0.1;
-      display_Cardiac_Graph(Display,
-                            (120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0,
-                             120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0,
-                             120, 0),
-                            1,
-                            240,
-                            120
-                           );
-      delay 0.1;
-   end loop;
+   --STM32.Board.Initialize_LEDs
+   
+   TestADCProc;
+   LCD_Std_Out.Clear_Screen;
+   LCD_Std_Out.Put_Line ("END");
+   delay 2000.0;
 end Main;
