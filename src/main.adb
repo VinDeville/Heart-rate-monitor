@@ -47,7 +47,7 @@ with graph; use graph;
 
 procedure Main 
 is
-   BG : constant Bitmap_Color := (Alpha => 255, others => 64);
+   BG : constant Bitmap_Color := (Alpha => 0, others => 0);
 
    procedure Clear;
 
@@ -62,7 +62,7 @@ is
 
       LCD_Std_Out.Clear_Screen;
       
-      LCD_Std_Out.Put_Line ("Touch the screen to draw or");
+      --LCD_Std_Out.Put_Line ("Touch the screen to draw or");
       --LCD_Std_Out.Put_Line ("press the blue button for");
       --LCD_Std_Out.Put_Line ("a demo of drawing primitives.");
       --LCD_Std_Out.Put_Line (Positive'Image(Display.Pixel_Size(1)));
@@ -79,21 +79,34 @@ begin
 
    --  Initialize LCD
    Display.Initialize(Landscape);
-   Display.Initialize_Layer (1, ARGB_8888, 0, 0, 160, 120);
+   Display.Initialize_Layer (1, ARGB_8888, 0, 0, 240, 120);
    --  Initialize touch panel
    
    --  Initialize button
    User_Button.Initialize;
-   display_Cardiac_Graph(Display,
-                         (120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0),
-                         160,
-                         120
-                        );
+   
    --  Clear LCD (set background)
 
    --  The application: set pixel where the finger is (so that you
    --  cannot see what you are drawing).
    loop
-      null;
+      display_Cardiac_Graph(Display,
+                            (120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0,
+                             120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0,
+                             120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0),
+                            0,
+                            240,
+                            120
+                           );
+      delay 0.1;
+      display_Cardiac_Graph(Display,
+                            (120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0,
+                             120, 0, 120, 0, 120, 0, 120, 0, 120, 0, 120, 0,
+                             120, 0),
+                            1,
+                            240,
+                            120
+                           );
+      delay 0.1;
    end loop;
 end Main;
