@@ -41,6 +41,7 @@
 --  and received.
 
 with Message_Buffers;  use Message_Buffers;
+with HAL;           use HAL;
 
 package Serial_IO.Blocking is
    pragma Elaborate_Body;
@@ -74,6 +75,8 @@ package Serial_IO.Blocking is
      Pre  => (Initialized (This) or else raise Serial_Port_Uninitialized),
      Post => Msg.Length <= Msg.Physical_Size and
              Msg.Content_At (Msg.Length) /= Msg.Terminator;
+
+procedure Get_UART_Value (This : in out Serial_Port;  Value : out UInt32; Size : Positive);
    --  Callers wait until all characters are received.
 
 private

@@ -98,6 +98,23 @@ package body Serial_IO.Blocking is
          Msg.Append (Received_Char);
       end loop Receiving;
    end Get;
+   
+  procedure Get_UART_Value (This : in out Serial_Port;  Value : out UInt32; Size : Positive) is
+      Raw           : UInt9;
+   begin
+      Value := 0;
+      Receiving : for K in 1 .. Size loop
+         Await_Data_Available (This.Device.Transceiver.all);
+         Receive (This.Device.Transceiver.all, Raw);
+         if Value = 0 then
+           Value := Uint32(Raw);
+         elsif Value > Uint32(Raw) then
+           Value := UInt32(Raw) * 256 + Value;
+         else
+               Value := UInt32(Raw) + Value * 256;
+               end if;
+         end loop Receiving;
+   end Get_UART_Value;
 
    ----------------------
    -- Await_Send_Ready --
@@ -105,9 +122,9 @@ package body Serial_IO.Blocking is
 
    procedure Await_Send_Ready (This : USART) is
    begin
-      loop
-         exit when Tx_Ready (This);
-      end loop;
+     loop
+       exit when Tx_Ready (This);
+     end loop;
    end Await_Send_Ready;
 
    --------------------------
@@ -116,9 +133,9 @@ package body Serial_IO.Blocking is
 
    procedure Await_Data_Available (This : USART) is
    begin
-      loop
-         exit when Rx_Ready (This);
-      end loop;
+     loop
+       exit when Rx_Ready (This);
+     end loop;
    end Await_Data_Available;
 
 end Serial_IO.Blocking;
