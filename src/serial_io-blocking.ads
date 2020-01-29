@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 --                                                                          --
---                     Copyright (C) 2015-2016, AdaCore                     --
+--                  Copyright (C) 2015-2016, AdaCore                        --
 --                                                                          --
 --  Redistribution and use in source and binary forms, with or without      --
 --  modification, are permitted provided that the following conditions are  --
@@ -29,73 +29,62 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  A very simple draw application.
---  Use your finger to draw pixels.
+--  This package defines an abstract data type for a "serial port" providing
+--  blocking input (Get) and output (Put) procedures. The procedures are
+--  considered blocking in that they do not return to the caller until the
+--  entire message is received or sent.
+--
+--  The serial port abstraction is a wrapper around a USART peripheral,
+--  described by a value of type Peripheral_Descriptor.
+--
+--  Polling is used within the procedures to determine when characters are sent
+--  and received.
 
-with Last_Chance_Handler;  pragma Unreferenced (Last_Chance_Handler);
---  The "last chance handler" is the user-defined routine that is called when
---  an exception is propagated. We need it in the executable, therefore it
---  must be somewhere in the closure of the context clauses.
+with Message_Buffers;  use Message_Buffers;
 
-with STM32.Board;           use STM32.Board;
-with HAL.Bitmap;            use HAL.Bitmap;
-with HAL.Framebuffer;       use HAL.Framebuffer;
-with STM32.User_Button;     use STM32;
-with STM32.GPIO;            use STM32.GPIO;
-with BMP_Fonts;
-with LCD_Std_Out;
-with graph; use graph;
-with testadc; use testadc;
-with uart; use uart;
+package Serial_IO.Blocking is
+   pragma Elaborate_Body;
 
-procedure Main 
-is
-   BG : constant Bitmap_Color := (Alpha => 0, others => 0);
+   type Serial_Port (Device : not null access Peripheral_Descriptor) is
+     tagged limited private;
 
-   procedure Clear;
+   procedure Initialize (This : out Serial_Port)
+     with Post => (Initialized (This));
 
-   -----------
-   -- Clear --
-   -----------
+   function Initialized (This : Serial_Port) return Boolean with Inline;
 
-   procedure Clear is
-   begin
-      Display.Hidden_Buffer (1).Set_Source (BG);
-      Display.Hidden_Buffer (1).Fill;
+   Serial_Port_Uninitialized : exception;
 
-      LCD_Std_Out.Clear_Screen;
-      
-      --LCD_Std_Out.Put_Line ("Touch the screen to draw or");
-      --LCD_Std_Out.Put_Line ("press the blue button for");
-      --LCD_Std_Out.Put_Line ("a demo of drawing primitives.");
-      --LCD_Std_Out.Put_Line (Positive'Image(Display.Pixel_Size(1)));
+   procedure Configure
+     (This      : in out Serial_Port;
+      Baud_Rate : Baud_Rates;
+      Parity    : Parities     := No_Parity;
+      Data_Bits : Word_Lengths := Word_Length_8;
+      End_Bits  : Stop_Bits    := Stopbits_1;
+      Control   : Flow_Control := No_Flow_Control)
+     with
+       Pre => (Initialized (This) or else raise Serial_Port_Uninitialized);
 
+   procedure Put (This : in out Serial_Port; Msg : not null access Message) with
+     Pre => (Initialized (This) or else raise Serial_Port_Uninitialized);
+   --  Sends Msg.Length characters of Msg via USART attached to This. Callers
+   --  wait until all characters are sent.
 
-      Display.Update_Layer (1, Copy_Back => True);
-   end Clear;
+   procedure Get (This : in out Serial_Port;  Msg : not null access Message) with
+     Pre  => (Initialized (This) or else raise Serial_Port_Uninitialized),
+     Post => Msg.Length <= Msg.Physical_Size and
+             Msg.Content_At (Msg.Length) /= Msg.Terminator;
+   --  Callers wait until all characters are received.
 
-   type Mode is (Drawing_Mode, Bitmap_Showcase_Mode);
+private
 
-   Current_Mode : Mode := Drawing_Mode;
- begin
+   type Serial_Port (Device : access Peripheral_Descriptor) is tagged limited
+      record
+         Initialized : Boolean := False;
+      end record;
 
-   --  Initialize LCD
-   Display.Initialize(Landscape);
-   Display.Initialize_Layer (1, ARGB_8888, 0, 0, 240, 120);
-   --  Initialize touch panel
-   
-   --  Initialize button
-   --User_Button.Initialize;
-   
-   --  Clear LCD (set background)
+   procedure Await_Send_Ready (This : USART) with Inline;
 
-   --  The application: set pixel where the finger is (so that you
-   --  cannot see what you are drawing).
-   --STM32.Board.Initialize_LEDs
-   
-   --TestADCProc;
-   uartProcedure;
-   LCD_Std_Out.Clear_Screen;
-   LCD_Std_Out.Put_Line ("END");
-   delay 2000.0;
-end Main;
+   procedure Await_Data_Available (This : USART) with Inline;
+
+end Serial_IO.Blocking;

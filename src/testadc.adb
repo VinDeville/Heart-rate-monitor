@@ -84,19 +84,10 @@ begin
          --integral := (integral + (error*dt));
          --output := ((Kp*error) + (Ki*integral));
          --Value := Percentage (output); -- duty cycle value
-            if Max < Raw then
-               Max := Raw;
+
                LCD_Std_Out.Clear_Screen;
-               LCD_Std_Out.Put_Line (Max'Image);
-               LCD_Std_Out.Put_Line (Min'Image);
-            end if;
-            if Min > Raw then
-               Min := Raw;
-               LCD_Std_Out.Clear_Screen;
-               LCD_Std_Out.Put_Line (Max'Image);
-               LCD_Std_Out.Put_Line (Min'Image);
-            end if;
-            --delay until Clock + Milliseconds (5);
+               LCD_Std_Out.Put_Line (Raw'Image);
+            delay until Clock + Milliseconds (100);
       end loop;
    end;
    end TestADCProc;

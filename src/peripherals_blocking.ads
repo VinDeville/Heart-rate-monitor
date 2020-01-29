@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 --                                                                          --
---                     Copyright (C) 2015-2016, AdaCore                     --
+--                  Copyright (C) 2015-2016, AdaCore                        --
 --                                                                          --
 --  Redistribution and use in source and binary forms, with or without      --
 --  modification, are permitted provided that the following conditions are  --
@@ -29,73 +29,21 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  A very simple draw application.
---  Use your finger to draw pixels.
+with STM32.Device;       use STM32.Device;
 
-with Last_Chance_Handler;  pragma Unreferenced (Last_Chance_Handler);
---  The "last chance handler" is the user-defined routine that is called when
---  an exception is propagated. We need it in the executable, therefore it
---  must be somewhere in the closure of the context clauses.
+with Serial_IO.Blocking;
 
-with STM32.Board;           use STM32.Board;
-with HAL.Bitmap;            use HAL.Bitmap;
-with HAL.Framebuffer;       use HAL.Framebuffer;
-with STM32.User_Button;     use STM32;
-with STM32.GPIO;            use STM32.GPIO;
-with BMP_Fonts;
-with LCD_Std_Out;
-with graph; use graph;
-with testadc; use testadc;
-with uart; use uart;
+use Serial_IO;
 
-procedure Main 
-is
-   BG : constant Bitmap_Color := (Alpha => 0, others => 0);
+package Peripherals_Blocking is
 
-   procedure Clear;
+   --  the specific port, pins, and USART selections are arbitrary.
+   Peripheral : aliased Serial_IO.Peripheral_Descriptor :=
+                  (Transceiver    => USART_1'Access,
+                   Transceiver_AF => GPIO_AF_USART1_7,
+                   Tx_Pin         => PB6,
+                   Rx_Pin         => PB7);
 
-   -----------
-   -- Clear --
-   -----------
+   COM : Blocking.Serial_Port (Peripheral'Access);
 
-   procedure Clear is
-   begin
-      Display.Hidden_Buffer (1).Set_Source (BG);
-      Display.Hidden_Buffer (1).Fill;
-
-      LCD_Std_Out.Clear_Screen;
-      
-      --LCD_Std_Out.Put_Line ("Touch the screen to draw or");
-      --LCD_Std_Out.Put_Line ("press the blue button for");
-      --LCD_Std_Out.Put_Line ("a demo of drawing primitives.");
-      --LCD_Std_Out.Put_Line (Positive'Image(Display.Pixel_Size(1)));
-
-
-      Display.Update_Layer (1, Copy_Back => True);
-   end Clear;
-
-   type Mode is (Drawing_Mode, Bitmap_Showcase_Mode);
-
-   Current_Mode : Mode := Drawing_Mode;
- begin
-
-   --  Initialize LCD
-   Display.Initialize(Landscape);
-   Display.Initialize_Layer (1, ARGB_8888, 0, 0, 240, 120);
-   --  Initialize touch panel
-   
-   --  Initialize button
-   --User_Button.Initialize;
-   
-   --  Clear LCD (set background)
-
-   --  The application: set pixel where the finger is (so that you
-   --  cannot see what you are drawing).
-   --STM32.Board.Initialize_LEDs
-   
-   --TestADCProc;
-   uartProcedure;
-   LCD_Std_Out.Clear_Screen;
-   LCD_Std_Out.Put_Line ("END");
-   delay 2000.0;
-end Main;
+end Peripherals_Blocking;
