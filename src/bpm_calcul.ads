@@ -1,23 +1,31 @@
 
 package BPM_Calcul is
-   type Cardic_Info is record
+   type Cardiac_Info_Type is record
       BPM : Integer range 0 .. 226;
       Signal : Integer;
       Last_Beat_Time : Long_Integer;
-      IBI : Integer;
+      IBI : Long_Integer;
       Pulse : Boolean;
+      Default_Thresh : Integer;
       Thresh : Integer;
-      Sample_Interval_Ms : Integer;
-      Sample_Counter : Integer;
+      Peak : Integer;
+      Trough : Integer;
+      Amp : Integer;
+      Sample_Interval_Ms : Long_Integer;
+      Sample_Counter : Long_Integer;
       First_Beat : Boolean;
       Second_Beat : Boolean;
    end record;
 
-   procedure Init;
+   procedure Init(Cardiac_Info : in out Cardiac_Info_Type);
 
-   function Get_BPM() return Integer;
+   function Get_BPM(Cardiac_Info : Cardiac_Info_Type) return Integer;
 
-   procedure Process();
+   procedure Set_Default_Thresh(Cardiac_Info : in out Cardiac_Info_Type; Value : Integer);
+
+   procedure Next_Sample(Cardiac_Info : in out Cardiac_Info_Type);
+
+   procedure Process(Cardiac_Info : in out Cardiac_Info_Type);
 
 
 
