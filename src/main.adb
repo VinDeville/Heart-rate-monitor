@@ -53,7 +53,7 @@ with BPM_Calcul; use BPM_Calcul;
 procedure Main 
 is
   UART_Value : Uint16;
-  Data : Data_Array (1 .. 200) := (others => 0);
+  Data : Data_Array (1 .. 200) := (others => 512);
   Offset : Natural := 0;
   Cardiac_Info : Cardiac_Info_Type;
   Text_Layer : Positive := 1;
@@ -79,17 +79,14 @@ begin
   --TestADCProc;
   Initialize (COM);
   Configure (COM, Baud_Rate => 9_600);
-  LCD_Std_Out.Clear_Screen;
-  LCD_Std_Out.Put_Line ("Test");
-  for J in Data'Range loop
-    Get_UART_Value (COM, UART_Value, 2);
-    Data(J) := Integer(UART_Value); 
-  end loop;
   loop
+    LCD_Std_Out.Clear_Screen;
+    LCD_Std_Out.Put_Line (Get_BPM(Cardiac_Info)'Image);
     display_Cardiac_Graph(Display, Data, Offset, 320, 120, Graph_Layer);
     for J in 1 .. 10 loop
       Get_UART_Value (COM, UART_Value, 2);
       Data(Offset + J) := Integer(UART_Value); 
+      Process(Cardiac_Info, Integer(UART_Value));
     end loop;
     Offset := Offset + 10;
     if Offset >= Data'Last then

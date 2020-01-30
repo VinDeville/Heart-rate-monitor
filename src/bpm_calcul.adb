@@ -1,4 +1,3 @@
-
 package body BPM_Calcul is
 
    procedure Init(Cardiac_Info : in out Cardiac_Info_Type) is
@@ -17,6 +16,7 @@ package body BPM_Calcul is
       Cardiac_Info.Sample_Counter := 0;
       Cardiac_Info.First_Beat := True;
       Cardiac_Info.Second_Beat := False;
+      Cardiac_Info.Sample_Interval_Last := Ada.Real_Time.Clock;
    end;
 
    function Get_BPM(Cardiac_Info : Cardiac_Info_Type) return Integer is
@@ -33,9 +33,14 @@ package body BPM_Calcul is
 
    procedure Process(Cardiac_Info : in out Cardiac_Info_Type; Signal : Integer) is
       N : Long_Integer;
+      Current_Time : Ada.Real_Time.Time;
    begin
       Cardiac_Info.Signal := Signal;
-      Cardiac_Info.Sample_Counter := Cardiac_Info.Sample_Counter + Cardiac_Info.Sample_Interval_Ms;
+      Current_Time := Ada.Real_Time.Clock;
+      Cardiac_Info.Sample_Counter := Cardiac_Info.Sample_Counter
+        + Long_Integer((Current_Time - Cardiac_Info.Sample_Interval_Last)
+                        / Milliseconds(1));
+      Cardiac_Info.Sample_Interval_Last := Current_Time;
       N := Cardiac_Info.Sample_Counter - Cardiac_Info.Last_Beat_Time;
 
       -- Find peak and through
@@ -78,7 +83,7 @@ package body BPM_Calcul is
       end if;
 
       if Cardiac_Info.Signal < Cardiac_Info.Thresh and
-        Cardiac_Info.Pulse then
+         Cardiac_Info.Pulse then
          Cardiac_Info.Pulse := False;
          Cardiac_Info.Amp := Cardiac_Info.Peak - Cardiac_Info.Trough;
          Cardiac_Info.Thresh := Cardiac_Info.Amp / 2 + Cardiac_Info.Trough;
@@ -99,6 +104,5 @@ package body BPM_Calcul is
          Cardiac_Info.Amp := 100;
       end if;
    end;
-
 
 end BPM_Calcul;

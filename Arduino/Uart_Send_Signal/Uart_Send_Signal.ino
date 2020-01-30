@@ -14,5 +14,5 @@ void loop() {
 
  Serial.write(value >> 8);
  Serial.write(value);
- delay(50);
+ delay(25);
 }

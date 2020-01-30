@@ -1,4 +1,4 @@
-
+with Ada.Real_Time;       use Ada.Real_Time;
 package BPM_Calcul is
    type Cardiac_Info_Type is record
       BPM : Integer range 0 .. 226;
@@ -15,6 +15,7 @@ package BPM_Calcul is
       Sample_Counter : Long_Integer;
       First_Beat : Boolean;
       Second_Beat : Boolean;
+      Sample_Interval_Last : Ada.Real_Time.Time;
    end record;
 
    procedure Init(Cardiac_Info : in out Cardiac_Info_Type);
