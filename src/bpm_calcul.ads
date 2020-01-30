@@ -6,12 +6,8 @@ package BPM_Calcul is
       Last_Beat_Time : Long_Integer;
       IBI : Long_Integer;
       Pulse : Boolean;
-      Default_Thresh : Integer;
       Thresh : Integer;
-      Peak : Integer;
-      Trough : Integer;
       Amp : Integer;
-      Sample_Interval_Ms : Long_Integer;
       Sample_Counter : Long_Integer;
       First_Beat : Boolean;
       Second_Beat : Boolean;
@@ -23,7 +19,8 @@ package BPM_Calcul is
    function Get_BPM(Cardiac_Info : Cardiac_Info_Type) return Integer;
 
    procedure Process(Cardiac_Info : in out Cardiac_Info_Type; Signal : Integer)
-     with Post => Cardiac_Info.Sample_Counter'Old < Cardiac_Info.Sample_Counter ;
+     with Post => Cardiac_Info.Sample_Counter'Old < Cardiac_Info.Sample_Counter and then
+     Cardiac_Info.Sample_Interval_Last'Old < Cardiac_Info.Sample_Interval_Last;
 
 
 
