@@ -1,11 +1,12 @@
 with HAL.Bitmap;            use HAL.Bitmap;
+package body graph
+is
 
-package body graph is
    
    
    procedure display_Cardiac_Graph(Display : in out Framebuffer_ILI9341.Frame_Buffer;
                                    Data : Data_Array;
-                                   Offset : Integer;
+                                   Offset : Natural;
                                    Width : Positive;
                                    Height : Positive
                                   ) is
@@ -17,6 +18,7 @@ package body graph is
       Display.Hidden_Buffer (1).Fill;
       Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Green);
       for I in Data'First + Offset + 1 .. Data'Last loop
+         pragma Loop_Variant(Increases => I);
          Draw_Line
                     (Display.Hidden_Buffer (1).all,
                      Start     => (Index * Width / Data'Length, Current* Height / 1024),
@@ -26,7 +28,8 @@ package body graph is
          Index := Index + 1;
          Current := Data(i);
       end loop;
-      for I in Data'First .. Data'First + Offset loop
+      for I in Data'First .. Data'First + Offset - 1 loop
+         pragma Loop_Variant(Increases => I);
          Draw_Line
                     (Display.Hidden_Buffer (1).all,
                      Start     => (Index * Width / Data'Length, Current* Height / 1024),

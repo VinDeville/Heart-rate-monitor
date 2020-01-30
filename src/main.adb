@@ -51,36 +51,9 @@ with graph; use graph;
 
 procedure Main 
 is
-  BG : constant Bitmap_Color := (Alpha => 0, others => 0);
   UART_Value : Uint16;
   Data : Data_Array (1 .. 200) := (others => 0);
-  Counter : Integer := 0;
-
-  procedure Clear;
-
-  -----------
-  -- Clear --
-  -----------
-
-  procedure Clear is
-  begin
-    Display.Hidden_Buffer (1).Set_Source (BG);
-    Display.Hidden_Buffer (1).Fill;
-
-    LCD_Std_Out.Clear_Screen;
-
-    --LCD_Std_Out.Put_Line ("Touch the screen to draw or");
-    --LCD_Std_Out.Put_Line ("press the blue button for");
-    --LCD_Std_Out.Put_Line ("a demo of drawing primitives.");
-    --LCD_Std_Out.Put_Line (Positive'Image(Display.Pixel_Size(1)));
-
-
-    Display.Update_Layer (1, Copy_Back => True);
-  end Clear;
-
-  type Mode is (Drawing_Mode, Bitmap_Showcase_Mode);
-
-  Current_Mode : Mode := Drawing_Mode;
+  Offset : Natural := 0;
 begin
 
   --  Initialize LCD
@@ -105,25 +78,14 @@ begin
     Data(J) := Integer(UART_Value); 
   end loop;
   loop
-    display_Cardiac_Graph(Display, Data, Counter, 320, 120);
+    display_Cardiac_Graph(Display, Data, Offset, 320, 120);
     for J in 1 .. 10 loop
       Get_UART_Value (COM, UART_Value, 2);
-      Data(Counter + J) := Integer(UART_Value); 
+      Data(Offset + J) := Integer(UART_Value); 
     end loop;
-    Counter := Counter + 10;
-    if Counter >= Data'Last then
-      Counter := 0;
-    end if;
-  end loop;
-  loop
-    display_Cardiac_Graph(Display, Data, Counter, 320, 120);
-    for J in 1 .. 10 loop
-      Get_UART_Value (COM, UART_Value, 2);
-      Data(Counter + J) := Integer(UART_Value); 
-    end loop;
-    Counter := Counter + 10;
-    if Counter >= Data'Last then
-      Counter := 0;
+    Offset := Offset + 10;
+    if Offset >= Data'Last then
+      Offset := 0;
     end if;
   end loop;
 end Main;
