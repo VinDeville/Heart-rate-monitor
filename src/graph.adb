@@ -11,39 +11,31 @@ package body graph is
                                   ) is
       Index : Integer := 0;
       BG : constant Bitmap_Color := (Alpha => 255, others => 64);
+      Current : Integer := Data(Offset + 1);
    begin
       Display.Hidden_Buffer (1).Set_Source (BG);
       Display.Hidden_Buffer (1).Fill;
       Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Green);
-      for I in Data'First + Offset .. Data'Last - 1 loop
+      for I in Data'First + Offset + 1 .. Data'Last loop
          Draw_Line
                     (Display.Hidden_Buffer (1).all,
-                     Start     => (Index * Width / Data'Length, Data(i)),
-                     Stop      => ((Index + 1) * Width / Data'Length, Data(i + 1)),
+                     Start     => (Index * Width / Data'Length, Current* Height / 1024),
+                     Stop      => ((Index + 1) * Width / Data'Length, Data(i) * height / 1024),
                      Thickness => 1,
                      Fast      => False);
          Index := Index + 1;
+         Current := Data(i);
       end loop;
-      if Offset /= 0 then
-         Draw_Line
-                 (Display.Hidden_Buffer (1).all,
-                     Start     => (Index * Width / Data'Length, Data(Data'Last)),
-                     Stop      => ((Index + 1) * Width / Data'Length, Data(Data'First)),
-                     Thickness => 1,
-                     Fast      => False);
-         Index := Index + 1;   
-      end if;
-      for I in Data'First + 1 .. Data'First + Offset - 1 loop
+      for I in Data'First .. Data'First + Offset loop
          Draw_Line
                     (Display.Hidden_Buffer (1).all,
-                     Start     => (Index * Width / Data'Length, Data(i)),
-                     Stop      => ((Index + 1) * Width / Data'Length, Data(i + 1)),
+                     Start     => (Index * Width / Data'Length, Current* Height / 1024),
+                     Stop      => ((Index + 1) * Width / Data'Length, Data(i) * height / 1024),
                      Thickness => 1,
                      Fast      => False);
          Index := Index + 1;
+         Current := Data(i);
       end loop;
-      
-      
       Display.Update_Layer (1, Copy_Back => True);
    end display_Cardiac_Graph;
 end graph;

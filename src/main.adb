@@ -50,52 +50,50 @@ with uart; use uart;
 
 procedure Main 
 is
-   BG : constant Bitmap_Color := (Alpha => 0, others => 0);
+ BG : constant Bitmap_Color := (Alpha => 0, others => 0);
 
-   procedure Clear;
+ procedure Clear;
 
-   -----------
-   -- Clear --
-   -----------
+ -----------
+ -- Clear --
+ -----------
 
-   procedure Clear is
-   begin
-      Display.Hidden_Buffer (1).Set_Source (BG);
-      Display.Hidden_Buffer (1).Fill;
-
-      LCD_Std_Out.Clear_Screen;
-      
-      --LCD_Std_Out.Put_Line ("Touch the screen to draw or");
-      --LCD_Std_Out.Put_Line ("press the blue button for");
-      --LCD_Std_Out.Put_Line ("a demo of drawing primitives.");
-      --LCD_Std_Out.Put_Line (Positive'Image(Display.Pixel_Size(1)));
-
-
-      Display.Update_Layer (1, Copy_Back => True);
-   end Clear;
-
-   type Mode is (Drawing_Mode, Bitmap_Showcase_Mode);
-
-   Current_Mode : Mode := Drawing_Mode;
+ procedure Clear is
  begin
+    Display.Hidden_Buffer (1).Set_Source (BG);
+    Display.Hidden_Buffer (1).Fill;
 
-   --  Initialize LCD
-   Display.Initialize(Landscape);
-   Display.Initialize_Layer (1, ARGB_8888, 0, 0, 240, 120);
-   --  Initialize touch panel
-   
-   --  Initialize button
-   --User_Button.Initialize;
-   
-   --  Clear LCD (set background)
+    LCD_Std_Out.Clear_Screen;
+    
+    --LCD_Std_Out.Put_Line ("Touch the screen to draw or");
+    --LCD_Std_Out.Put_Line ("press the blue button for");
+    --LCD_Std_Out.Put_Line ("a demo of drawing primitives.");
+    --LCD_Std_Out.Put_Line (Positive'Image(Display.Pixel_Size(1)));
 
-   --  The application: set pixel where the finger is (so that you
-   --  cannot see what you are drawing).
-   --STM32.Board.Initialize_LEDs
-   
-   --TestADCProc;
-   uartProcedure;
-   LCD_Std_Out.Clear_Screen;
-   LCD_Std_Out.Put_Line ("END");
-   delay 2000.0;
+
+    Display.Update_Layer (1, Copy_Back => True);
+ end Clear;
+
+ type Mode is (Drawing_Mode, Bitmap_Showcase_Mode);
+
+ Current_Mode : Mode := Drawing_Mode;
+begin
+
+ --  Initialize LCD
+ Display.Initialize(Landscape);
+ Display.Initialize_Layer (1, ARGB_8888, 0, 0, 320, 120);
+ --  Initialize touch panel
+ 
+ --  Initialize button
+ --User_Button.Initialize;
+ 
+ --  Clear LCD (set background)
+
+ --  The application: set pixel where the finger is (so that you
+ --  cannot see what you are drawing).
+ --STM32.Board.Initialize_LEDs
+ 
+ --TestADCProc;
+ uartProcedure;
+ delay 10000.0;
 end Main;
