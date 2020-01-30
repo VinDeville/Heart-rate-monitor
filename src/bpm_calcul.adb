@@ -13,7 +13,7 @@ package body BPM_Calcul is
       Cardiac_Info.Peak := 512;
       Cardiac_Info.Trough := 512;
       Cardiac_Info.Amp := 0;
-      Cardiac_Info.Sample_Interval_Ms := 0;
+      Cardiac_Info.Sample_Interval_Ms := 50;
       Cardiac_Info.Sample_Counter := 0;
       Cardiac_Info.First_Beat := True;
       Cardiac_Info.Second_Beat := False;
@@ -24,10 +24,6 @@ package body BPM_Calcul is
       return Cardiac_Info.BPM;
    end;
 
-   procedure Next_Sample(Cardiac_Info : in out Cardiac_Info_Type) is
-   begin
-      Cardiac_Info.Signal := 0; -- CALL TO THE FUNCTION
-   end;
 
    procedure Set_Default_Thresh(Cardiac_Info : in out Cardiac_Info_Type; Value : Integer) is
    begin
@@ -35,9 +31,10 @@ package body BPM_Calcul is
    end;
 
 
-   procedure Process(Cardiac_Info : in out Cardiac_Info_Type) is
+   procedure Process(Cardiac_Info : in out Cardiac_Info_Type; Signal : Integer) is
       N : Long_Integer;
    begin
+      Cardiac_Info.Signal := Signal;
       Cardiac_Info.Sample_Counter := Cardiac_Info.Sample_Counter + Cardiac_Info.Sample_Interval_Ms;
       N := Cardiac_Info.Sample_Counter - Cardiac_Info.Last_Beat_Time;
 

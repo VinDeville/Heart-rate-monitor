@@ -23,9 +23,8 @@ package BPM_Calcul is
 
    procedure Set_Default_Thresh(Cardiac_Info : in out Cardiac_Info_Type; Value : Integer);
 
-   procedure Next_Sample(Cardiac_Info : in out Cardiac_Info_Type);
 
-   procedure Process(Cardiac_Info : in out Cardiac_Info_Type);
+   procedure Process(Cardiac_Info : in out Cardiac_Info_Type; Signal : Integer);
 
 
 
