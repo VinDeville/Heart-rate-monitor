@@ -42,29 +42,33 @@ with HAL.Bitmap;            use HAL.Bitmap;
 with HAL.Framebuffer;       use HAL.Framebuffer;
 with STM32.User_Button;     use STM32;
 with STM32.GPIO;            use STM32.GPIO;
+with Serial_IO.Blocking;    use Serial_IO.Blocking;
+with Peripherals_Blocking;  use Peripherals_Blocking;
 with BMP_Fonts;
 with LCD_Std_Out;
+with HAL;           use HAL;
 with graph; use graph;
-with testadc; use testadc;
-with uart; use uart;
 
 procedure Main 
 is
- BG : constant Bitmap_Color := (Alpha => 0, others => 0);
+  BG : constant Bitmap_Color := (Alpha => 0, others => 0);
+  UART_Value : Uint16;
+  Data : Data_Array (1 .. 200) := (others => 0);
+  Counter : Integer := 0;
 
- procedure Clear;
+  procedure Clear;
 
- -----------
- -- Clear --
- -----------
+  -----------
+  -- Clear --
+  -----------
 
- procedure Clear is
- begin
+  procedure Clear is
+  begin
     Display.Hidden_Buffer (1).Set_Source (BG);
     Display.Hidden_Buffer (1).Fill;
 
     LCD_Std_Out.Clear_Screen;
-    
+
     --LCD_Std_Out.Put_Line ("Touch the screen to draw or");
     --LCD_Std_Out.Put_Line ("press the blue button for");
     --LCD_Std_Out.Put_Line ("a demo of drawing primitives.");
@@ -72,28 +76,54 @@ is
 
 
     Display.Update_Layer (1, Copy_Back => True);
- end Clear;
+  end Clear;
 
- type Mode is (Drawing_Mode, Bitmap_Showcase_Mode);
+  type Mode is (Drawing_Mode, Bitmap_Showcase_Mode);
 
- Current_Mode : Mode := Drawing_Mode;
+  Current_Mode : Mode := Drawing_Mode;
 begin
 
- --  Initialize LCD
- Display.Initialize(Landscape);
- Display.Initialize_Layer (1, ARGB_8888, 0, 0, 320, 120);
- --  Initialize touch panel
- 
- --  Initialize button
- --User_Button.Initialize;
- 
- --  Clear LCD (set background)
+  --  Initialize LCD
+  Display.Initialize(Landscape);
+  Display.Initialize_Layer (1, ARGB_8888, 0, 0, 320, 120);
+  --  Initialize touch panel
 
- --  The application: set pixel where the finger is (so that you
- --  cannot see what you are drawing).
- --STM32.Board.Initialize_LEDs
- 
- --TestADCProc;
- uartProcedure;
- delay 10000.0;
+  --  Initialize button
+  --User_Button.Initialize;
+
+  --  Clear LCD (set background)
+
+  --  The application: set pixel where the finger is (so that you
+  --  cannot see what you are drawing).
+  --STM32.Board.Initialize_LEDs
+
+  --TestADCProc;
+  Initialize (COM);
+  Configure (COM, Baud_Rate => 9_600);
+  for J in Data'Range loop
+    Get_UART_Value (COM, UART_Value, 2);
+    Data(J) := Integer(UART_Value); 
+  end loop;
+  loop
+    display_Cardiac_Graph(Display, Data, Counter, 320, 120);
+    for J in 1 .. 10 loop
+      Get_UART_Value (COM, UART_Value, 2);
+      Data(Counter + J) := Integer(UART_Value); 
+    end loop;
+    Counter := Counter + 10;
+    if Counter >= Data'Last then
+      Counter := 0;
+    end if;
+  end loop;
+  loop
+    display_Cardiac_Graph(Display, Data, Counter, 320, 120);
+    for J in 1 .. 10 loop
+      Get_UART_Value (COM, UART_Value, 2);
+      Data(Counter + J) := Integer(UART_Value); 
+    end loop;
+    Counter := Counter + 10;
+    if Counter >= Data'Last then
+      Counter := 0;
+    end if;
+  end loop;
 end Main;

@@ -76,7 +76,7 @@ package Serial_IO.Blocking is
      Post => Msg.Length <= Msg.Physical_Size and
              Msg.Content_At (Msg.Length) /= Msg.Terminator;
 
-procedure Get_UART_Value (This : in out Serial_Port;  Value : out UInt32; Size : Positive);
+procedure Get_UART_Value (This : in out Serial_Port;  Value : out UInt16; Size : Positive);
    --  Callers wait until all characters are received.
 
 private

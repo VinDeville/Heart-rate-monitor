@@ -34,108 +34,110 @@ with HAL;           use HAL;
 
 package body Serial_IO.Blocking is
 
-   ----------------
-   -- Initialize --
-   ----------------
+  ----------------
+  -- Initialize --
+  ----------------
 
-   procedure Initialize (This : out Serial_Port) is
-   begin
-      Serial_IO.Initialize_Peripheral (This.Device);
-      This.Initialized := True;
-   end Initialize;
+  procedure Initialize (This : out Serial_Port) is
+  begin
+    Serial_IO.Initialize_Peripheral (This.Device);
+    This.Initialized := True;
+  end Initialize;
 
-   -----------------
-   -- Initialized --
-   -----------------
+  -----------------
+  -- Initialized --
+  -----------------
 
-   function Initialized (This : Serial_Port) return Boolean is
-     (This.Initialized);
+  function Initialized (This : Serial_Port) return Boolean is
+    (This.Initialized);
 
-   ---------------
-   -- Configure --
-   ---------------
+  ---------------
+  -- Configure --
+  ---------------
 
-   procedure Configure
-     (This      : in out Serial_Port;
-      Baud_Rate : Baud_Rates;
-      Parity    : Parities     := No_Parity;
-      Data_Bits : Word_Lengths := Word_Length_8;
-      End_Bits  : Stop_Bits    := Stopbits_1;
-      Control   : Flow_Control := No_Flow_Control)
-   is
-   begin
-      Serial_IO.Configure (This.Device, Baud_Rate, Parity, Data_Bits, End_Bits, Control);
-   end Configure;
+  procedure Configure
+    (This      : in out Serial_Port;
+    Baud_Rate : Baud_Rates;
+    Parity    : Parities     := No_Parity;
+    Data_Bits : Word_Lengths := Word_Length_8;
+    End_Bits  : Stop_Bits    := Stopbits_1;
+    Control   : Flow_Control := No_Flow_Control)
+  is
+  begin
+    Serial_IO.Configure (This.Device, Baud_Rate, Parity, Data_Bits, End_Bits, Control);
+  end Configure;
 
-   ---------
-   -- Put --
-   ---------
+  ---------
+  -- Put --
+  ---------
 
-   procedure Put (This : in out Serial_Port;  Msg : not null access Message) is
-   begin
-      for Next in 1 .. Msg.Length loop
-         Await_Send_Ready (This.Device.Transceiver.all);
-         Transmit
-           (This.Device.Transceiver.all,
-            Character'Pos (Msg.Content_At (Next)));
-      end loop;
-   end Put;
+  procedure Put (This : in out Serial_Port;  Msg : not null access Message) is
+  begin
+    for Next in 1 .. Msg.Length loop
+      Await_Send_Ready (This.Device.Transceiver.all);
+      Transmit
+        (This.Device.Transceiver.all,
+        Character'Pos (Msg.Content_At (Next)));
+    end loop;
+  end Put;
 
-   ---------
-   -- Get --
-   ---------
+  ---------
+  -- Get --
+  ---------
 
-   procedure Get (This : in out Serial_Port;  Msg : not null access Message) is
-      Received_Char : Character;
-      Raw           : UInt9;
-   begin
-      Msg.Clear;
-      Receiving : for K in 1 .. Msg.Physical_Size loop
-         Await_Data_Available (This.Device.Transceiver.all);
-         Receive (This.Device.Transceiver.all, Raw);
-         Received_Char := Character'Val (Raw);
-         exit Receiving when Received_Char = Msg.Terminator;
-         Msg.Append (Received_Char);
-      end loop Receiving;
-   end Get;
-   
-  procedure Get_UART_Value (This : in out Serial_Port;  Value : out UInt32; Size : Positive) is
-      Raw           : UInt9;
-   begin
-      Value := 0;
-      Receiving : for K in 1 .. Size loop
-         Await_Data_Available (This.Device.Transceiver.all);
-         Receive (This.Device.Transceiver.all, Raw);
-         if Value = 0 then
-           Value := Uint32(Raw);
-         elsif Value > Uint32(Raw) then
-           Value := UInt32(Raw) * 256 + Value;
-         else
-               Value := UInt32(Raw) + Value * 256;
-               end if;
-         end loop Receiving;
-   end Get_UART_Value;
+  procedure Get (This : in out Serial_Port;  Msg : not null access Message) is
+    Received_Char : Character;
+    Raw           : UInt9;
+  begin
+    Msg.Clear;
+    Receiving : for K in 1 .. Msg.Physical_Size loop
+    Await_Data_Available (This.Device.Transceiver.all);
+    Receive (This.Device.Transceiver.all, Raw);
+    Received_Char := Character'Val (Raw);
+    exit Receiving when Received_Char = Msg.Terminator;
+    Msg.Append (Received_Char);
+    end loop Receiving;
+  end Get;
 
-   ----------------------
-   -- Await_Send_Ready --
-   ----------------------
+  procedure Get_UART_Value (This : in out Serial_Port;  Value : out UInt16; Size : Positive) is
+    Raw           : UInt9;
+    Raw16         : UInt16;
+  begin
+    Value := 0;
+    Receiving : for K in 1 .. Size loop
+    Await_Data_Available (This.Device.Transceiver.all);
+    Receive (This.Device.Transceiver.all, Raw);
+    Raw16 := Uint16(Raw);
+    if Value = 0 then
+      Value := Raw16;
+    elsif Value > Raw16 then
+      Value := Raw16 * 256 + Value;
+    else
+      Value := Raw16 + Value * 256;
+    end if;
+    end loop Receiving;
+  end Get_UART_Value;
 
-   procedure Await_Send_Ready (This : USART) is
-   begin
-     loop
-       exit when Tx_Ready (This);
-     end loop;
-   end Await_Send_Ready;
+  ----------------------
+  -- Await_Send_Ready --
+  ----------------------
 
-   --------------------------
-   -- Await_Data_Available --
-   --------------------------
+  procedure Await_Send_Ready (This : USART) is
+  begin
+    loop
+      exit when Tx_Ready (This);
+    end loop;
+  end Await_Send_Ready;
 
-   procedure Await_Data_Available (This : USART) is
-   begin
-     loop
-       exit when Rx_Ready (This);
-     end loop;
-   end Await_Data_Available;
+  --------------------------
+  -- Await_Data_Available --
+  --------------------------
+
+  procedure Await_Data_Available (This : USART) is
+  begin
+    loop
+      exit when Rx_Ready (This);
+    end loop;
+  end Await_Data_Available;
 
 end Serial_IO.Blocking;
