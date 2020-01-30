@@ -85,10 +85,6 @@ package body BPM_Calcul is
       if Cardiac_Info.Signal < Cardiac_Info.Thresh and
          Cardiac_Info.Pulse then
          Cardiac_Info.Pulse := False;
-         Cardiac_Info.Amp := Cardiac_Info.Peak - Cardiac_Info.Trough;
-         Cardiac_Info.Thresh := Cardiac_Info.Amp / 2 + Cardiac_Info.Trough;
-         Cardiac_Info.Peak := Cardiac_Info.Thresh;
-         Cardiac_Info.Trough := Cardiac_Info.Thresh;
       end if;
 
       if N > 2500 then

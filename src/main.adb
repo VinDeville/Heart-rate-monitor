@@ -58,6 +58,8 @@ is
   Cardiac_Info : Cardiac_Info_Type;
   Text_Layer : Positive := 1;
   Graph_Layer: Positive := 2;
+  BPM_Value : Integer;
+  BPM_Valid : Boolean := True;
 begin
 
   --  Initialize LCD
@@ -80,17 +82,27 @@ begin
   Initialize (COM);
   Configure (COM, Baud_Rate => 9_600);
   loop
-    LCD_Std_Out.Clear_Screen;
-    LCD_Std_Out.Put_Line (Get_BPM(Cardiac_Info)'Image);
-    display_Cardiac_Graph(Display, Data, Offset, 320, 120, Graph_Layer);
-    for J in 1 .. 10 loop
-      Get_UART_Value (COM, UART_Value, 2);
-      Data(Offset + J) := Integer(UART_Value); 
-      Process(Cardiac_Info, Integer(UART_Value));
-    end loop;
-    Offset := Offset + 10;
-    if Offset >= Data'Last then
-      Offset := 0;
-    end if;
+      BPM_Value := Get_BPM(Cardiac_Info);
+      if (BPM_Value in 60 .. 200) then
+        LCD_Std_Out.Clear_Screen;
+        LCD_Std_Out.Put_Line (Get_BPM(Cardiac_Info)'Image);
+        BPM_Valid := True;
+      else
+        if BPM_Valid then
+          LCD_Std_Out.Clear_Screen;
+          LCD_Std_Out.Put_Line ("Invalid BPM");
+        end if;
+        BPM_Valid := False;
+      end if;
+      display_Cardiac_Graph(Display, Data, Offset, 320, 120, Graph_Layer);
+      for J in 1 .. 10 loop
+        Get_UART_Value (COM, UART_Value, 2);
+        Data(Offset + J) := Integer(UART_Value); 
+        Process(Cardiac_Info, Integer(UART_Value));
+      end loop;
+      Offset := Offset + 10;
+      if Offset >= Data'Last then
+        Offset := 0;
+      end if;
   end loop;
 end Main;
