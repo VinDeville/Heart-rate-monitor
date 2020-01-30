@@ -1,7 +1,7 @@
 with Ada.Real_Time;       use Ada.Real_Time;
 package BPM_Calcul is
    type Cardiac_Info_Type is record
-      BPM : Integer range 0 .. 226;
+      BPM : Integer;
       Signal : Integer;
       Last_Beat_Time : Long_Integer;
       IBI : Long_Integer;
@@ -22,10 +22,8 @@ package BPM_Calcul is
 
    function Get_BPM(Cardiac_Info : Cardiac_Info_Type) return Integer;
 
-   procedure Set_Default_Thresh(Cardiac_Info : in out Cardiac_Info_Type; Value : Integer);
-
-
-   procedure Process(Cardiac_Info : in out Cardiac_Info_Type; Signal : Integer);
+   procedure Process(Cardiac_Info : in out Cardiac_Info_Type; Signal : Integer)
+     with Post => Cardiac_Info.Sample_Counter'Old < Cardiac_Info.Sample_Counter ;
 
 
 

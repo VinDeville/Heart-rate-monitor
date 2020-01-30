@@ -49,6 +49,7 @@ with LCD_Std_Out;
 with HAL;           use HAL;
 with graph; use graph;
 with BPM_Calcul; use BPM_Calcul;
+with Ada.Exceptions;   use Ada.Exceptions;
 
 procedure Main 
 is
@@ -81,9 +82,10 @@ begin
   --TestADCProc;
   Initialize (COM);
   Configure (COM, Baud_Rate => 9_600);
+  Initialize_LEDs;
   loop
       BPM_Value := Get_BPM(Cardiac_Info);
-      if (BPM_Value in 60 .. 200) then
+      if (BPM_Value in 60 .. 150) then
         LCD_Std_Out.Clear_Screen;
         LCD_Std_Out.Put_Line (Get_BPM(Cardiac_Info)'Image);
         BPM_Valid := True;
@@ -99,10 +101,23 @@ begin
         Get_UART_Value (COM, UART_Value, 2);
         Data(Offset + J) := Integer(UART_Value); 
         Process(Cardiac_Info, Integer(UART_Value));
+        if BPM_Valid and then Cardiac_Info.Pulse then
+          STM32.Board.Turn_On(Green_LED);
+        else
+          STM32.Board.Turn_Off(Green_LED);
+        end if;
       end loop;
       Offset := Offset + 10;
       if Offset >= Data'Last then
         Offset := 0;
       end if;
-  end loop;
+   end loop;
+exception
+   when Error : others =>
+      LCD_Std_Out.Clear_Screen;
+      LCD_Std_Out.Put_Line(Exception_Information(Error));
+      loop
+         null;
+      end loop;
+     
 end Main;
