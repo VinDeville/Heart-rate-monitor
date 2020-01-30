@@ -7,10 +7,12 @@ is
                                   Data : Data_Array;
                                   Offset : Natural;
                                   Width : Positive;
-                                  Height : Positive
+                                  Height : Positive;
+                                  Layer : Positive
                                   ) with
     Pre => Offset < Data'Last - 1 and then
            Display.width  >= Width and then
-           Display.height >= Height;
+           Display.height >= Height and then
+           Display.Initialized;
 
 end graph;

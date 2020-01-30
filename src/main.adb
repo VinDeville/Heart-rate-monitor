@@ -48,17 +48,23 @@ with BMP_Fonts;
 with LCD_Std_Out;
 with HAL;           use HAL;
 with graph; use graph;
+with BPM_Calcul; use BPM_Calcul;
 
 procedure Main 
 is
   UART_Value : Uint16;
   Data : Data_Array (1 .. 200) := (others => 0);
   Offset : Natural := 0;
+  Cardiac_Info : Cardiac_Info_Type;
+  Text_Layer : Positive := 1;
+  Graph_Layer: Positive := 2;
 begin
 
   --  Initialize LCD
   Display.Initialize(Landscape);
-  Display.Initialize_Layer (1, ARGB_8888, 0, 0, 320, 120);
+  Display.Initialize_Layer (Text_Layer, ARGB_8888, 0, 0, 320, 120);
+  Display.Initialize_Layer (Graph_Layer, ARGB_8888, 0, 120, 320, 120);
+  Init(Cardiac_Info);
   --  Initialize touch panel
 
   --  Initialize button
@@ -73,12 +79,14 @@ begin
   --TestADCProc;
   Initialize (COM);
   Configure (COM, Baud_Rate => 9_600);
+  LCD_Std_Out.Clear_Screen;
+  LCD_Std_Out.Put_Line ("Test");
   for J in Data'Range loop
     Get_UART_Value (COM, UART_Value, 2);
     Data(J) := Integer(UART_Value); 
   end loop;
   loop
-    display_Cardiac_Graph(Display, Data, Offset, 320, 120);
+    display_Cardiac_Graph(Display, Data, Offset, 320, 120, Graph_Layer);
     for J in 1 .. 10 loop
       Get_UART_Value (COM, UART_Value, 2);
       Data(Offset + J) := Integer(UART_Value); 

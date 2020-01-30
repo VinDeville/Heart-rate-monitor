@@ -8,19 +8,20 @@ is
                                    Data : Data_Array;
                                    Offset : Natural;
                                    Width : Positive;
-                                   Height : Positive
+                                   Height : Positive;
+                                   Layer : Positive
                                   ) is
       Index : Integer := 0;
       BG : constant Bitmap_Color := (Alpha => 255, others => 64);
       Current : Integer := Data(Offset + 1);
    begin
-      Display.Hidden_Buffer (1).Set_Source (BG);
-      Display.Hidden_Buffer (1).Fill;
-      Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Green);
+      Display.Hidden_Buffer (Layer).Set_Source (BG);
+      Display.Hidden_Buffer (Layer).Fill;
+      Display.Hidden_Buffer (Layer).Set_Source (HAL.Bitmap.Green);
       for I in Data'First + Offset + 1 .. Data'Last loop
          pragma Loop_Variant(Increases => I);
          Draw_Line
-                    (Display.Hidden_Buffer (1).all,
+                    (Display.Hidden_Buffer (Layer).all,
                      Start     => (Index * Width / Data'Length, Current* Height / 1024),
                      Stop      => ((Index + 1) * Width / Data'Length, Data(i) * height / 1024),
                      Thickness => 1,
@@ -31,7 +32,7 @@ is
       for I in Data'First .. Data'First + Offset - 1 loop
          pragma Loop_Variant(Increases => I);
          Draw_Line
-                    (Display.Hidden_Buffer (1).all,
+                    (Display.Hidden_Buffer (Layer).all,
                      Start     => (Index * Width / Data'Length, Current* Height / 1024),
                      Stop      => ((Index + 1) * Width / Data'Length, Data(i) * height / 1024),
                      Thickness => 1,
@@ -39,6 +40,6 @@ is
          Index := Index + 1;
          Current := Data(i);
       end loop;
-      Display.Update_Layer (1, Copy_Back => True);
+      Display.Update_Layer (Layer, Copy_Back => True);
    end display_Cardiac_Graph;
 end graph;
