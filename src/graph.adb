@@ -23,8 +23,8 @@ is
          pragma Loop_Variant(Increases => I);
          Draw_Line
                     (Display.Hidden_Buffer (Layer).all,
-                     Start     => (I * Width / Data'Length, Current* Height / 1024),
-                     Stop      => ((I + 1) * Width / Data'Length, Data(Index) * height / 1024),
+                     Start     => (I * Width / Data'Length, Current* Height / 1023),
+                     Stop      => ((I + 1) * Width / Data'Length, Data(Index) * height / 1023),
                      Thickness => 1,
                      Fast      => False);
          Current := Data(Index);

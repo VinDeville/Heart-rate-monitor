@@ -40,11 +40,8 @@ with Last_Chance_Handler;  pragma Unreferenced (Last_Chance_Handler);
 with STM32.Board;           use STM32.Board;
 with HAL.Bitmap;            use HAL.Bitmap;
 with HAL.Framebuffer;       use HAL.Framebuffer;
-with STM32.User_Button;     use STM32;
-with STM32.GPIO;            use STM32.GPIO;
 with Serial_IO.Blocking;    use Serial_IO.Blocking;
 with Peripherals_Blocking;  use Peripherals_Blocking;
-with BMP_Fonts;
 with LCD_Std_Out;
 with HAL;           use HAL;
 with graph; use graph;
@@ -62,7 +59,6 @@ is
   BPM_Value : Integer;
   BPM_Valid : Boolean := True;
 begin
-
   --  Initialize LCD
   Display.Initialize(Landscape);
   Display.Initialize_Layer (Text_Layer, ARGB_8888, 0, 0, 320, 120);
