@@ -1,8 +1,5 @@
 with HAL.Bitmap;            use HAL.Bitmap;
-package body graph
-is
-
-   
+package body Display_Graph is
    
    procedure display_Cardiac_Graph(Display : in out Framebuffer_ILI9341.Frame_Buffer;
                                    Data : Data_Array;
@@ -31,4 +28,4 @@ is
       end loop;
       Display.Update_Layer (Layer, Copy_Back => True);
    end display_Cardiac_Graph;
-end graph;
+end Display_Graph;

@@ -1,5 +1,5 @@
 with Ada.Real_Time;       use Ada.Real_Time;
-package BPM_Calcul is
+package BPM_Compute is
    type Cardiac_Info_Type is record
       Last_Beat_Time : Long_Integer;
       IBI : Long_Integer;
@@ -20,4 +20,4 @@ package BPM_Calcul is
 
 
 
-end BPM_Calcul;
+end BPM_Compute;

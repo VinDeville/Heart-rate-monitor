@@ -1,4 +1,4 @@
-package body BPM_Calcul is
+package body BPM_Compute is
 
   procedure Init(Cardiac_Info : in out Cardiac_Info_Type) is
   begin
@@ -50,4 +50,4 @@ package body BPM_Calcul is
     end if;
   end;
 
-end BPM_Calcul;
+end BPM_Compute;

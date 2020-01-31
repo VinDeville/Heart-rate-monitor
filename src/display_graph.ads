@@ -1,7 +1,6 @@
 with Framebuffer_ILI9341;
-package graph 
+package Display_Graph
 is
-
   type Data_Array is array (Positive range <>) of Integer;
   procedure display_Cardiac_Graph(Display :  in out Framebuffer_ILI9341.Frame_Buffer;
                                   Data : Data_Array;
@@ -15,4 +14,4 @@ is
            Display.height >= Height and then
            Display.Initialized;
 
-end graph;
+end Display_Graph;

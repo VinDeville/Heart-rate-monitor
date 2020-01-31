@@ -44,8 +44,8 @@ with Serial_IO.Blocking;    use Serial_IO.Blocking;
 with Peripherals_Blocking;  use Peripherals_Blocking;
 with LCD_Std_Out;
 with HAL;           use HAL;
-with graph; use graph;
-with BPM_Calcul; use BPM_Calcul;
+with Display_Graph; use Display_Graph;
+with BPM_Compute;   use BPM_Compute;
 with Ada.Exceptions;   use Ada.Exceptions;
 
 procedure Main 
