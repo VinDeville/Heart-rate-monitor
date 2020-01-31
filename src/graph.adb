@@ -18,27 +18,16 @@ is
       Display.Hidden_Buffer (Layer).Set_Source (BG);
       Display.Hidden_Buffer (Layer).Fill;
       Display.Hidden_Buffer (Layer).Set_Source (HAL.Bitmap.Green);
-      for I in Data'First + Offset + 1 .. Data'Last loop
+      for I in 0 .. Data'Length - 1 loop
+         Index := Data'First + ((Offset + I + 1) mod Data'Length);
          pragma Loop_Variant(Increases => I);
          Draw_Line
                     (Display.Hidden_Buffer (Layer).all,
-                     Start     => (Index * Width / Data'Length, Current* Height / 1024),
-                     Stop      => ((Index + 1) * Width / Data'Length, Data(i) * height / 1024),
+                     Start     => (I * Width / Data'Length, Current* Height / 1024),
+                     Stop      => ((I + 1) * Width / Data'Length, Data(Index) * height / 1024),
                      Thickness => 1,
                      Fast      => False);
-         Index := Index + 1;
-         Current := Data(i);
-      end loop;
-      for I in Data'First .. Data'First + Offset - 1 loop
-         pragma Loop_Variant(Increases => I);
-         Draw_Line
-                    (Display.Hidden_Buffer (Layer).all,
-                     Start     => (Index * Width / Data'Length, Current* Height / 1024),
-                     Stop      => ((Index + 1) * Width / Data'Length, Data(i) * height / 1024),
-                     Thickness => 1,
-                     Fast      => False);
-         Index := Index + 1;
-         Current := Data(i);
+         Current := Data(Index);
       end loop;
       Display.Update_Layer (Layer, Copy_Back => True);
    end display_Cardiac_Graph;

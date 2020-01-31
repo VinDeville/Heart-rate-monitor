@@ -57,8 +57,8 @@ is
   Data : Data_Array (1 .. 200) := (others => 512);
   Offset : Natural := 0;
   Cardiac_Info : Cardiac_Info_Type;
-  Text_Layer : Positive := 1;
-  Graph_Layer: Positive := 2;
+  Text_Layer : Constant Positive := 1;
+  Graph_Layer: Constant Positive := 2;
   BPM_Value : Integer;
   BPM_Valid : Boolean := True;
 begin

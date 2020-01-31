@@ -2,22 +2,17 @@ package body BPM_Calcul is
 
   procedure Init(Cardiac_Info : in out Cardiac_Info_Type) is
   begin
-    Cardiac_Info.BPM := 0;
-    Cardiac_Info.Signal := 0;
     Cardiac_Info.Last_Beat_Time := 0;
     Cardiac_Info.IBI := 750;
     Cardiac_Info.Pulse := False;
     Cardiac_Info.Thresh := 550;
-    Cardiac_Info.Amp := 0;
     Cardiac_Info.Sample_Counter := 0;
-    Cardiac_Info.First_Beat := True;
-    Cardiac_Info.Second_Beat := False;
     Cardiac_Info.Sample_Interval_Last := Ada.Real_Time.Clock;
   end;
 
   function Get_BPM(Cardiac_Info : Cardiac_Info_Type)     return Integer is
   begin
-    return Cardiac_Info.BPM; 
+    return 60000 / Integer(Cardiac_Info.IBI);
   end;
 
 
@@ -25,7 +20,6 @@ package body BPM_Calcul is
     N : Long_Integer;
     Current_Time : Ada.Real_Time.Time;
   begin
-    Cardiac_Info.Signal := Signal;
     Current_Time := Ada.Real_Time.Clock;
     Cardiac_Info.Sample_Counter := Cardiac_Info.Sample_Counter
     + Long_Integer((Current_Time - Cardiac_Info.Sample_Interval_Last)
@@ -35,45 +29,24 @@ package body BPM_Calcul is
 
     -- Heart beat
     if N > 250 then
-      if Cardiac_Info.Signal > Cardiac_Info.Thresh and
+      if Signal > Cardiac_Info.Thresh and
         not Cardiac_Info.Pulse and
         N > (Cardiac_Info.IBI / 5) * 3 then
         Cardiac_Info.Pulse := True;
         Cardiac_Info.IBI := Cardiac_Info.Sample_Counter - Cardiac_Info.Last_Beat_Time;
         Cardiac_Info.Last_Beat_Time := Cardiac_Info.Sample_Counter;
-
-
-        if Cardiac_Info.Second_Beat then
-          Cardiac_Info.Second_Beat := False;
-          --for I in range 0 .. 9 loop
-
-          --end loop;
-
-        end if;
-
-        if Cardiac_Info.First_Beat then
-          Cardiac_Info.First_Beat := False;
-          Cardiac_Info.Second_Beat := True;
-          return;
-        end if;
-
-        Cardiac_Info.BPM := 60000 / Integer(Cardiac_Info.IBI);
       end if;
     end if;
 
-    if Cardiac_Info.Signal < Cardiac_Info.Thresh and
+    if Signal < Cardiac_Info.Thresh and
       Cardiac_Info.Pulse then
       Cardiac_Info.Pulse := False;
     end if;
 
     if N > 2500 then
       Cardiac_Info.Last_Beat_Time := Cardiac_Info.Sample_Counter;
-      Cardiac_Info.First_Beat := True;
-      Cardiac_Info.Second_Beat := False;
-      Cardiac_Info.BPM := 0;
       Cardiac_Info.IBI := 600;
       Cardiac_Info.Pulse := False;
-      Cardiac_Info.Amp := 100;
     end if;
   end;
 
