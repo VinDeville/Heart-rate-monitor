@@ -1,4 +1,4 @@
-with graph;                 use graph;
+with Display_Graph;         use Display_Graph;
 with STM32.Board;           use STM32.Board;
 with HAL.Bitmap;            use HAL.Bitmap;
 with HAL.Framebuffer;       use HAL.Framebuffer;
